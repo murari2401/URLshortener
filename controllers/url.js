@@ -8,15 +8,28 @@ const URL = require("../models/url");
 async function handleGenerateShortURL(req, res) {
   const body = req.body;
   if (!body.url) {
-    res.status(400).json({ error: "Give a url in body" });
+    return res.status(400).json({ error: "Give a url in body" });
   }
-  const shortId = nanoid(8);
-  await URL.create({
-    shortID: shortId,
-    redirectURL: body.url,
-    visitHistory: [],
-  });
-  res.json({shortId})
+  try{
+    const result = await URL.findOne({
+        redirectURL:body.url,
+        })
+        if(result){
+        return res.json({shortId: result.shortID});
+        }
+
+    const shortId = nanoid(8);
+    await URL.create({
+        shortID: shortId,
+        redirectURL: body.url,
+        visitHistory: [],
+    });
+    return res.json({shortId})
+  }
+  catch(error){
+    console.error(error);
+    return res.status(500).json({Error:"Internal server error"});
+  }
 }
 
 async function handleGetShortURL(req,res){
