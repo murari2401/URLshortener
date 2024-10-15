@@ -1,4 +1,8 @@
-const { nanoid } = require("nanoid");
+let nanoid;
+import("nanoid").then(module => {
+  nanoid = module.nanoid; // Store the nanoid function
+});
+
 const URL = require("../models/url");
 
 async function handleGenerateShortURL(req, res) {
@@ -12,7 +16,23 @@ async function handleGenerateShortURL(req, res) {
     redirectURL: body.url,
     visitHistory: [],
   });
-  module.exports = {
-    handleGenerateShortURL,
-  };
+  res.json({shortId})
 }
+
+async function handleGetShortURL(req,res){
+    const shortID = req.params.shortID;
+    const entry = await URL.findOneAndUpdate({
+        shortID,
+    },{$push:{
+        visitHistory:{
+            timeStamp:Date.now(),
+        }
+    }})
+    res.redirect(entry.redirectURL)
+}
+
+module.exports = {
+    handleGenerateShortURL,
+    handleGetShortURL
+};
+
