@@ -31,8 +31,34 @@ async function handleGetShortURL(req,res){
     res.redirect(entry.redirectURL)
 }
 
+async function handleGetAnalytics(req, res) {
+    const shortID = req.params.shortID;
+  
+    try {
+      // Find the document by shortID
+      const result = await URL.findOne({ shortID });
+  
+      // If no document is found, return a 404 error
+      if (!result) {
+        return res.status(404).json({ error: "ShortID not found" });
+      }
+  
+      // Return the analytics data
+      res.json({
+        totalClicks: result.visitHistory.length,
+        analytics: result.visitHistory,
+      });
+      
+    } catch (error) {
+      // Catch and handle any potential errors
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+  
 module.exports = {
     handleGenerateShortURL,
-    handleGetShortURL
+    handleGetShortURL,
+    handleGetAnalytics
 };
 

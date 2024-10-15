@@ -15,7 +15,7 @@ app.use(express.json())
 app.use('/url',urlRoute);
 
 app.get('/:shortID',urlRoute);
-
+app.get('/analytics/:shortID',urlRoute)
 app.listen(PORT,()=>{
     console.log(`Server started at ${PORT}`);
 })
