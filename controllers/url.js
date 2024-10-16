@@ -15,7 +15,10 @@ async function handleGenerateShortURL(req, res) {
         redirectURL:body.url,
         })
         if(result){
-        return res.json({shortId: result.shortID});
+          // return res.json({shortId: result.shortID});
+          return res.render('home',{
+            ID: result.shortID,
+          });
         }
 
     const shortId = nanoid(8);
@@ -24,7 +27,10 @@ async function handleGenerateShortURL(req, res) {
         redirectURL: body.url,
         visitHistory: [],
     });
-    return res.json({shortId})
+    // return res.json({shortId})
+    return res.render('home',{
+      ID: shortId,
+    });
   }
   catch(error){
     console.error(error);

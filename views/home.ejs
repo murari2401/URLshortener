@@ -1,11 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+  <head>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+  </head>
+  <body>
     <h1>URL Shortener</h1>
-</body>
+    <% if (locals.ID) { %>
+    <p>
+      URL Generated:
+      <a href="http://localhost:8001/url/<%= ID %>" target="_blank">
+        http://localhost:8001/url/<%= ID %>
+      </a>
+    </p>
+    <% } %>
+    <form method="POST" action="/url/generate">
+      <label for="">Enter your original URL</label>
+      <input type="text" name="url" placeholder="https://www.example.com" />
+      <button type="submit">Generate</button>
+    </form>
+    <br>
+    <div>
+      <% if (locals.urls) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Sl. no</th>
+            <th>Short ID</th>
+            <th>Redirect</th>
+            <th>Clicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% urls.forEach((url, index) => { %> <!-- Pass index as the second argument -->
+          <tr>
+            <td><%= index + 1 %></td> <!-- Use the passed index here -->
+            <td><%= url.shortID %></td>
+            <td><a href="<%= url.redirectURL %>" target="_blank"><%= url.redirectURL %></a></td>
+            <td><%= url.visitHistory.length %></td>  
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
 </html>
