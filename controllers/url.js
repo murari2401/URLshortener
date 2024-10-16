@@ -32,17 +32,30 @@ async function handleGenerateShortURL(req, res) {
   }
 }
 
-async function handleGetShortURL(req,res){
-    const shortID = req.params.shortID;
-    const entry = await URL.findOneAndUpdate({
-        shortID,
-    },{$push:{
-        visitHistory:{
-            timeStamp:Date.now(),
-        }
-    }})
-    res.redirect(entry.redirectURL)
+async function handleGetShortURL(req, res) {
+  const shortID = req.params.shortID;
+  console.log("Received shortID:", shortID); // Log the received shortID
+
+  try {
+    const entry = await URL.findOneAndUpdate(
+      { shortID },
+      { $push: { visitHistory: { timeStamp: Date.now() } } },
+      { new: true }
+    );
+
+    if (!entry) {
+      console.log("Short URL not found for shortID:", shortID); // Log if not found
+      return res.status(404).send('Short URL not found');
+    }
+
+    console.log("Redirecting to:", entry.redirectURL); // Log the redirection URL
+    return res.redirect(entry.redirectURL);
+  } catch (error) {
+    console.error('Error fetching or updating URL:', error);
+    return res.status(500).send('Server error');
+  }
 }
+
 
 async function handleGetAnalytics(req, res) {
     const shortID = req.params.shortID;
@@ -57,7 +70,7 @@ async function handleGetAnalytics(req, res) {
       }
   
       // Return the analytics data
-      res.json({
+      return res.json({
         totalClicks: result.visitHistory.length,
         analytics: result.visitHistory,
       });
@@ -65,7 +78,7 @@ async function handleGetAnalytics(req, res) {
     } catch (error) {
       // Catch and handle any potential errors
       console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   }
   
