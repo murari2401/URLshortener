@@ -1,20 +1,22 @@
 const {getUser}=require('../service/auth')
 
 function restrictToLoggedinUserOnly(req, res, next) {
-const { uid } = req.cookies;
-
-if (!uid || !getUser(uid)) {
-    // If the user is not logged in, redirect to login page
-    console.log("No session or invalid session. Redirecting to login.");
-    return res.redirect("/login");
+    const userUid = req.cookies?.uid;
+    if(!userUid)    return res.redirect("/login");
+    const user = getUser(userUid);
+    if(!user)   return res.redirect("/login");
+    req.user=user;
+    next();
 }
 
-// Otherwise, continue to the next middleware or route
-console.log("Session is valid. Proceeding to home.");
-next();
+async function checkAuth(req,res,next){
+    const userUid = req.cookies?.uid;
+    const user = getUser(userUid);
+    req.user=user;
+    next();
 }
 
-  
 module.exports={
     restrictToLoggedinUserOnly,
+    checkAuth
 }
